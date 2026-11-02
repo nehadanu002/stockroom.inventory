@@ -1,0 +1,133 @@
+
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Product Inventory</h1>
+        <div class="page-subtitle">Manage and monitor your inventory</div>
+    </div>
+    <a href="{{ url_for('add_product') }}" class="btn">
+        + Add Product
+    </a>
+</div>
+
+<div class="products-summary">
+    <div class="products-summary-card">
+        <span class="summary-label">Total Products</span>
+        <strong>{{ products|length }}</strong>
+        <small>Products displayed</small>
+    </div>
+    <div class="products-summary-card">
+        <span class="summary-label">Inventory Status</span>
+        <strong>Active</strong>
+        <small>Inventory management</small>
+    </div>
+</div>
+
+<form class="search-bar product-search" method="get">
+    <input
+        type="text"
+        name="search"
+        placeholder="Search by name, SKU, or category..."
+        value="{{ search }}"
+    >
+    <button class="btn" type="submit">Search</button>
+
+    {% if search %}
+        <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Clear</a>
+    {% endif %}
+</form>
+
+<div class="card products-card">
+    <div class="products-card-header">
+        <div>
+            <h2 class="card-title">All Products</h2>
+            <p class="section-description">Your complete product inventory list</p>
+        </div>
+        <span class="count-badge">{{ products|length }} Products</span>
+    </div>
+
+    {% if products %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Category</th>
+                    <th class="num">Quantity</th>
+                    <th class="num">Unit Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>
+                        <strong class="product-name">{{ p.name }}</strong>
+                    </td>
+
+                    <td>
+                        <span class="sku-text">{{ p.sku }}</span>
+                    </td>
+
+                    <td>{{ p.category }}</td>
+
+                    <td class="num">
+                        <strong>{{ p.quantity_in_stock }}</strong>
+                    </td>
+
+                    <td class="num">
+                        <strong>${{ "%.2f"|format(p.unit_price) }}</strong>
+                    </td>
+
+                    <td>
+                        {% if p.quantity_in_stock <= p.reorder_level %}
+                            <span class="badge badge-danger">Low Stock</span>
+                        {% else %}
+                            <span class="badge badge-success">In Stock</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="row-actions">
+                            <a href="{{ url_for('edit_product', product_id=p.id) }}"
+                               class="btn btn-secondary btn-sm">Edit</a>
+
+                            <form method="post"
+                                  action="{{ url_for('delete_product', product_id=p.id) }}"
+                                  onsubmit="return confirm('Delete {{ p.name }}? This cannot be undone.');">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">▦</div>
+
+        {% if search %}
+            <strong>No matching products found</strong>
+            <p>Try searching with another product name or SKU.</p>
+            <a href="{{ url_for('list_products') }}">Clear search</a>
+        {% else %}
+            <strong>Your inventory is empty</strong>
+            <p>Add your first product to get started.</p>
+            <a href="{{ url_for('add_product') }}">+ Add Product</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

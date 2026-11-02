@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Stockroom{% endblock %} | Inventory Management</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3">
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">S</div>
+                <div>
+                    <div class="sidebar-brand">Stockroom</div>
+                    <div class="sidebar-tagline">Inventory Manager</div>
+                </div>
+            </div>
+
+            <div class="nav-heading">MAIN MENU</div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}"
+                   class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">
+                    <span class="nav-icon">⌂</span> Dashboard
+                </a>
+
+                <a href="{{ url_for('list_products') }}"
+                   class="{{ 'active' if request.endpoint in ['list_products','add_product','edit_product'] else '' }}">
+                    <span class="nav-icon">▦</span> Products
+                </a>
+
+                <a href="{{ url_for('record_sale') }}"
+                   class="{{ 'active' if request.endpoint == 'record_sale' else '' }}">
+                    <span class="nav-icon">＋</span> Record Sale
+                </a>
+
+                <a href="{{ url_for('list_sales') }}"
+                   class="{{ 'active' if request.endpoint == 'list_sales' else '' }}">
+                    <span class="nav-icon">◷</span> Sales History
+                </a>
+
+                <a href="{{ url_for('reports') }}"
+                   class="{{ 'active' if request.endpoint == 'reports' else '' }}">
+                    <span class="nav-icon">▤</span> Reports
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="footer-dot"></div>
+                Inventory Management System
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <div class="topbar-label">BUSINESS MANAGEMENT</div>
+                    <div class="topbar-heading">Stockroom Dashboard</div>
+                </div>
+                <div class="profile">
+                    <div class="profile-icon">S</div>
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <section class="main-content">
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+
+            </section>
+        </main>
+
+    </div>
+</body>
+</html>

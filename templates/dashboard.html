@@ -1,0 +1,191 @@
+
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<!-- Welcome section -->
+<div class="welcome-section">
+    <div>
+        <div class="welcome-tag">BUSINESS OVERVIEW</div>
+        <h1 class="page-title">Welcome back, Admin! 👋</h1>
+        <p class="welcome-text">Here's what's happening with your inventory today.</p>
+    </div>
+
+    <div class="welcome-date">
+        <span>📅</span> Inventory Dashboard
+    </div>
+</div>
+
+<!-- Summary cards -->
+<div class="stat-grid">
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <div class="stat-label">TOTAL PRODUCTS</div>
+            <div class="stat-icon purple">▦</div>
+        </div>
+        <div class="stat-value">{{ total_products }}</div>
+        <div class="stat-description">Products in your inventory</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <div class="stat-label">STOCK VALUE</div>
+            <div class="stat-icon blue">$</div>
+        </div>
+        <div class="stat-value">${{ "%.2f"|format(stock_value) }}</div>
+        <div class="stat-description">Total value of available stock</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <div class="stat-label">TOTAL REVENUE</div>
+            <div class="stat-icon green">↗</div>
+        </div>
+        <div class="stat-value">${{ "%.2f"|format(total_revenue) }}</div>
+        <div class="stat-description">Revenue from recorded sales</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-top">
+            <div class="stat-label">LOW STOCK ITEMS</div>
+            <div class="stat-icon orange">!</div>
+        </div>
+        <div class="stat-value">{{ low_stock|length }}</div>
+        <div class="stat-description">Products requiring attention</div>
+    </div>
+
+</div>
+
+<!-- Quick actions -->
+<div class="quick-actions-section">
+    <h2 class="section-heading">Quick Actions</h2>
+
+    <div class="quick-actions">
+        <a href="{{ url_for('add_product') }}" class="quick-action">
+            <span class="quick-action-icon">＋</span>
+            <span>
+                <strong>Add Product</strong>
+                <small>Add a new inventory item</small>
+            </span>
+            <span class="action-arrow">→</span>
+        </a>
+
+        <a href="{{ url_for('record_sale') }}" class="quick-action">
+            <span class="quick-action-icon sale-icon">↗</span>
+            <span>
+                <strong>Record Sale</strong>
+                <small>Register a new sale</small>
+            </span>
+            <span class="action-arrow">→</span>
+        </a>
+
+        <a href="{{ url_for('list_products') }}" class="quick-action">
+            <span class="quick-action-icon product-icon">▦</span>
+            <span>
+                <strong>View Products</strong>
+                <small>Manage your inventory</small>
+            </span>
+            <span class="action-arrow">→</span>
+        </a>
+    </div>
+</div>
+
+<!-- Inventory alerts -->
+<div class="card">
+    <div class="section-header">
+        <div>
+            <h2 class="card-title">Low Stock Alerts</h2>
+            <p class="section-description">Products that need restocking</p>
+        </div>
+
+        <span class="count-badge">{{ low_stock|length }} Alert(s)</span>
+    </div>
+
+    {% if low_stock %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th class="num">In Stock</th>
+                    <th class="num">Reorder Level</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for p in low_stock %}
+                <tr>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td>{{ p.sku }}</td>
+                    <td class="num">{{ p.quantity_in_stock }}</td>
+                    <td class="num">{{ p.reorder_level }}</td>
+                    <td><span class="badge badge-danger">Low Stock</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">✓</div>
+        <strong>All looking good!</strong>
+        <p>No products are currently low on stock.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Recent sales -->
+<div class="card">
+    <div class="section-header">
+        <div>
+            <h2 class="card-title">Recent Sales</h2>
+            <p class="section-description">Your latest recorded transactions</p>
+        </div>
+
+        <a href="{{ url_for('list_sales') }}" class="view-all-link">
+            View All →
+        </a>
+    </div>
+
+    {% if recent_sales %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th class="num">Quantity</th>
+                    <th class="num">Total Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for s in recent_sales %}
+                <tr>
+                    <td>{{ s.sale_date }}</td>
+                    <td><strong>{{ s.product_name }}</strong></td>
+                    <td class="num">{{ s.quantity_sold }}</td>
+                    <td class="num amount-text">
+                        ${{ "%.2f"|format(s.total_amount) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">↗</div>
+        <strong>No sales yet</strong>
+        <p>
+            Start recording transactions to see your sales here.
+            <a href="{{ url_for('record_sale') }}">Record your first sale</a>.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

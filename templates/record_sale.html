@@ -1,0 +1,107 @@
+
+{% extends "base.html" %}
+{% block title %}Record Sale{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Record a Sale</h1>
+        <div class="page-subtitle">Create a sales transaction and update inventory automatically.</div>
+    </div>
+</div>
+
+<div class="sale-layout">
+
+    <div class="card sale-form-card">
+        <div class="sale-card-heading">
+            <div class="sale-heading-icon">＋</div>
+            <div>
+                <h2 class="card-title">Sale Details</h2>
+                <p class="section-description">Enter the product and quantity sold.</p>
+            </div>
+        </div>
+
+        {% if products %}
+        <form method="post">
+
+            <div class="sale-form-group">
+                <label for="product_id">Select Product</label>
+                <select id="product_id" name="product_id" required>
+                    <option value="">Choose a product...</option>
+                    {% for p in products %}
+                    <option value="{{ p.id }}">
+                        {{ p.name }} — {{ p.sku }} (${{ "%.2f"|format(p.unit_price) }}, {{ p.quantity_in_stock }} in stock)
+                    </option>
+                    {% endfor %}
+                </select>
+                <small>Choose the product for this transaction.</small>
+            </div>
+
+            <div class="sale-form-group">
+                <label for="quantity_sold">Quantity Sold</label>
+                <input
+                    type="number"
+                    id="quantity_sold"
+                    name="quantity_sold"
+                    min="1"
+                    value="1"
+                    required
+                >
+                <small>Enter the number of units sold.</small>
+            </div>
+
+            <div class="sale-note">
+                <strong>Inventory update</strong>
+                <p>When the sale is recorded, the sold quantity will automatically be deducted from available stock.</p>
+            </div>
+
+            <div class="sale-form-actions">
+                <button type="submit" class="btn">Record Sale</button>
+                <a href="{{ url_for('list_sales') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+
+        </form>
+
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">▦</div>
+            <strong>No products available</strong>
+            <p>Add a product before recording a sale.</p>
+            <a href="{{ url_for('add_product') }}">+ Add Product</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="sale-info-card">
+        <div class="sale-info-icon">↗</div>
+        <h3>Sales Management</h3>
+        <p>Keep your inventory accurate by recording every product sale.</p>
+
+        <div class="sale-info-point">
+            <span>01</span>
+            <div>
+                <strong>Select a product</strong>
+                <small>Choose from your available inventory.</small>
+            </div>
+        </div>
+
+        <div class="sale-info-point">
+            <span>02</span>
+            <div>
+                <strong>Enter quantity</strong>
+                <small>Specify the number of units sold.</small>
+            </div>
+        </div>
+
+        <div class="sale-info-point">
+            <span>03</span>
+            <div>
+                <strong>Update inventory</strong>
+                <small>Stock is deducted automatically after a successful sale.</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
